@@ -201,7 +201,7 @@
 
     'Used to create each enemy with their associated picturebox attributes and enemy attributes of that wave
 
-    Public Sub CreateEnemies(NumberOfEnemies As Integer, EnemySizeX As Integer, EnemySizeY As Integer, EnemyColor As Color, movementSpeed As Integer, Health As Integer, CoinsDropped As Integer)
+    Public Sub CreateEnemies(NumberOfEnemies As Integer, EnemySizeX As Integer, EnemySizeY As Integer, EnemyColour As Color, movementSpeed As Integer, Health As Integer, CoinsDropped As Integer)
 
         'Redeclares the arrays to hold the amount of enemies needed for that wave
 
@@ -216,7 +216,7 @@
             PicEnemies(counter) = New PictureBox With {
                 .Location = New Point(-1000, -100),
                 .Size = New Size(EnemySizeX, EnemySizeY),
-                .BackColor = EnemyColor
+                .BackColor = EnemyColour
             }
 
             Controls.Add(PicEnemies(counter))

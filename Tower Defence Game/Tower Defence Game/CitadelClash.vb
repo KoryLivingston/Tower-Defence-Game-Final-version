@@ -341,7 +341,7 @@
     'If they have enough coins and are currently not placing a tower as well as the total towers placed has yet to reach 25 and the game hasn't ended
     'Then set towerplacing to true and show the cancel button
 
-    Private Sub TowerBuy1_Click(sender As Object, e As EventArgs) Handles BuyTower.Click
+    Private Sub BuyTower_Click(sender As Object, e As EventArgs) Handles BuyTower.Click
 
         If Coins >= 30 And TowerPlacing = False AndAlso TowerCount < 25 AndAlso Lives > 0 Then
 

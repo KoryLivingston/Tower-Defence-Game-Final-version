@@ -20,9 +20,9 @@
 
     End Sub
 
-    'Method to make the enemy move across the path
+    'Method to make the Enemy move across the path
     'Each condition adjusts the enemygraphic to the number of pixels equal to the movement speed in the given direction 
-    'Conditions are used to make the enemy move in one direction until it reaches a certain point, and then cause the enemy to move in the next direction.
+    'Conditions are used to make the Enemy move in one direction until it reaches a certain point, and then cause the enemy to move in the next direction.
 
     Public Sub MoveEnemy()
 
@@ -42,8 +42,8 @@
 
 
 
-    'Method used for when an enemy reaches the players base
-    'If there is a collision it will remove the enemy from the form, decrease player lives by 1 and increase enemieskilledinwave by 1
+    'Method used for when an Enemy reaches the players base
+    'If there is a collision it will remove the Enemy from the form, decrease player lives by 1 and increase enemieskilledinwave by 1
     'IsDead attribute is set to true to prevent the same enemy from triggering other enemy death conditions after it has died
 
     Public Sub EnemyReachedBase()
@@ -52,8 +52,8 @@
 
             Enemygraphic.Top -= 1000
             With CitadelClash
-                .setLives(1)
-                .setEnemiesKilledInWave(1)
+                .setLives()
+                .setEnemiesKilledInWave()
             End With
             IsDead = True
         End If
@@ -66,6 +66,8 @@
 
     End Function
 
+    'Methods for the Health PROPERTY
+
     Public Sub setHealth(DamageRecieved As Integer)
 
         Health -= DamageRecieved
@@ -77,6 +79,8 @@
         Return Health
 
     End Function
+
+
 
     Public Sub setIsdead(state As Boolean)
 

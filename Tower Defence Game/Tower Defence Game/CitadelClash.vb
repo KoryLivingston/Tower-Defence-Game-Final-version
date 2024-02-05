@@ -3,7 +3,7 @@
     'ATTRIBUTES USED FOR ENEMIES
 
 
-    'EnemiesKilledInWave will be incremented from 0 for every enemy that has been killed
+    'EnemiesKilledInWave will be incremented from 0 for every Enemy that has been killed
     'Totalenemiesinwave will be assigned to the value equal to the number of enemies created for that wave
     'WaveEnded is used as a boolean flag to prevent the condition from running while the next wave has yet to begin
     'These variables are used to check if a wave has ended
@@ -18,7 +18,7 @@
     Private PicEnemies() As PictureBox
 
     'additionalEnemies is increased by 2 after a wave has ended, used to increase the amount of enemies spawned for the next wave
-    'Enemynum is used to hold the index of the next enemy to be spawned as well is to check if every enemy has been spawned
+    'Enemynum is used to hold the index of the next Enemy to be spawned as well is to check if every Enemy has been spawned
     'LastEnemy holds the last Enemy to be spawned, used to check if this Enemy has died and to then spawn the remaining amount of enemies, in groups of 10 for that wave 2 seconds later
 
     Private additionalEnemies As Integer
@@ -29,14 +29,14 @@
     'ATTRIBUTES USED FOR TOWERS
 
 
-    'ARRAYS OF OBJECTS for Tower and Picturebox, to be used for each tower
-    'List to hold the objects of all towers, to allow tower objects to be added or removed when created or sold
+    'ARRAYS OF OBJECTS for Tower and Picturebox, to be used for each Tower
+    'INSTANTIATES a List to hold the objects of all Towers, to allow Tower objects to be added or removed when created or sold
 
     Private currentTowers As New List(Of Tower)
     Private Towers() As Tower
     Private PicTower() As PictureBox
 
-    'Arrays of Panel, Label and Picturebox for the UI for each tower
+    'ARRAYS OF OBJECTS of Panel, Label and Picturebox for the UI for each Tower
 
     Private TowerUI() As Panel
     Private LblBuffPrice() As Label
@@ -44,14 +44,14 @@
     Private UpgradeSlots2() As PictureBox
     Private UpgradeSlots3() As PictureBox
 
-    'Towercount is used to redclare the arrays to hold the next position of the next tower to be created
-    'Towerplacing is used to determine whether the player is placing a tower and to run certain code while doing so
+    'Towercount is used to redclare the arrays to hold the next position of the next Tower to be created
+    'Towerplacing is used to determine whether the player is placing a Tower and to run certain code while doing so
 
     Private TowerCount As Integer
     Private TowerPlacing As Boolean
 
-    'ClickedTower holds the tower object that has been clicked, this will then be used in the code involving the tower UI
-    'Index holds the position of this clicked tower in the list, so if it is sold it can be removed from the list
+    'ClickedTower holds the Tower object that has been clicked, this will then be used in the code involving the tower UI
+    'Index holds the position of this clicked Tower in the list, so if it is sold it can be removed from the list
 
     Private clickedTower As Tower
     Private Index As Integer
@@ -68,14 +68,15 @@
     'ATTRIBUTES USED FOR THE LEADERBOARD
 
 
-    'Arrays to hold the player names and wavesReached of the 5 players in the leaderboard, with 6th position being nothing, which will be assigned to the player name and wavesreached of the current player playing the game
+    'Arrays to hold the player names and wavesReached of the 5 players in the leaderboard, with 6th position being nothing, which will be assigned to the Player Name and Wavesreached of the current player playing the game
     'This will allow this new player to be insertion sorted into the leaderboard while removing one from it as well
+    'When the leaderboard will be displayed on the screen it will only display the first 5 Player Names and their associated Waves Reached
     'The arrrays have been set to initial values to hold a starting leaderboard.
 
     Private PlayerNames() As String = {"QSD", "BMV", "AJS", "123", "HJT", Nothing}
     Private WavesReached() As Integer = {"13", "10", "8", "12", "5", Nothing}
 
-    'Arrays of label to hold the associated playername and wavesreached to allow this information to be displayed on screen
+    'Arrays of label to hold the associated Playername and Wavesreached to allow this information to be displayed on screen
 
     Private NameLabels(4) As Label
     Private WaveReachedLabels(4) As Label
@@ -84,7 +85,7 @@
 
     Private UserName As String
 
-    'Information gathered while playing the game which will be used in the database
+    'Information gathered while playing the game which will be used in the Database
 
     Private TotalEnemiesKilled As Integer
     Private TotalCoinsEarned As Integer
@@ -116,7 +117,7 @@
 
         'Checks if a wave has ended by comparing the enemieskilled to the totalenemies from that wave
         'Waveended is used to prevent the condition from running again until the next wave has been called from pressing the next wave button
-        'Starts the wavecompletionUI timer to simulate the label appearing then dissapearing 2 seconds later and to show the nextwavebutton once this has been done
+        'Starts the wavecompletionUI timer to simulate the label appearing for only 2 seconds, and to show the Nextwavebutton once this has been done
 
         If WaveEnded = False And EnemiesKilledInWave = TotalEnemiesInWave Then
 
@@ -126,7 +127,7 @@
 
         End If
 
-        'Once the player Lives reaches 0 or they complete the final wave it ends the game
+        'Once the Player Lives reaches 0 or they complete the final wave it ends the game
         'if wave is equal to 26 they have completed the final wave 25 resulting in the game ending
 
         If Lives = 0 Or Wave = 26 Then
@@ -145,7 +146,7 @@
         Next
 
         'LastEnemy will only be assigned an Enemy object if there are remaining enemies to be spawned
-        'Checks if the last enemy has died so that the next group of enemies can be brought in, with a maximum of 10 prer group
+        'Checks if the Last Enemy has died so that the next group of enemies can be brought in, with a maximum of 10 per group
 
         If LastEnemy IsNot Nothing AndAlso LastEnemy.getIsDead = True Then
             NextSpawnDelay.Start()
@@ -160,7 +161,8 @@
 
 
 
-        'Finds every tower a target and updates its buff price label, so that it holds the price of the next available upgrade for that tower
+        'Finds every Tower a target
+        'Updates its Buff Price label, so that it holds the price of the next available upgrade for that tower
 
         For counter = 0 To TowerCount - 1
 
@@ -171,14 +173,16 @@
         Next
 
 
-        'Adjust the tower indicators position so that its center is at the cursors position
-        'Using a point object, the towerindicator location is offsetted from the ocation of the cursor by p
+        'Adjust the Tower indicators position, so that its centre is under the users Cursor at all times
+        'Using a point object, the towerindicator location is set to the Clients location of the cursor sbtracted by p
+        'Tower Indicator will only be shown while placing a Tower
+
 
         Dim p As New Point(18, 16)
 
         TowerIndicator.Location = New Point(PointToClient(Cursor.Position) - p)
 
-        'If the player is currently placing a tower then show the tower indicator and give it a transparent colour
+        'If the player is currently placing a Tower then show the Tower indicator and adjust its opacity
 
         If TowerPlacing = True Then
 
@@ -190,7 +194,7 @@
 
 
 
-        'UI brought to the front when in use to prevent the tower indicator from overlapping it
+        'UI brought to the front when in use to prevent the Tower indicator from overlapping it
 
         LblWavecompleted.BringToFront()
         NextWaveButton.BringToFront()
@@ -199,17 +203,17 @@
     End Sub
 
 
-    'Used to create each enemy with their associated picturebox attributes and enemy attributes of that wave
+    'Used to create each Enemy with their associated Picturebox attributes and Enemy attributes of that wave
 
     Public Sub CreateEnemies(NumberOfEnemies As Integer, EnemySizeX As Integer, EnemySizeY As Integer, EnemyColour As Color, movementSpeed As Integer, Health As Integer, CoinsDropped As Integer)
 
-        'Redeclares the arrays to hold the amount of enemies needed for that wave
+        'Redeclares the arrays to hold the amount of Enemies needed for that wave
 
         ReDim Enemies(NumberOfEnemies - 1)
         ReDim PicEnemies(NumberOfEnemies - 1)
 
-        'For every enemy a picturebox is created with its associated attributes, and then an enemy object is instantiated to hold this new enemy with its picturebox
-        'TotalEnemeisInWave is increased to be used in conditions throught the pogram
+        'For every Enemy a picturebox is created with its associated attributes, and then an Enemy object is instantiated to hold this new Enemy with its Picturebox
+        'TotalEnemeisInWave is increased to be used in conditions throught the Program
 
         For counter = 0 To NumberOfEnemies - 1
 
@@ -230,8 +234,8 @@
 
     End Sub
 
-    'Runs if a wave has ended and then stops 2 seconds later to simulate the label appearing then dissapearing 2 seconds later
-    'Displays the nextwavebutton to allow the next wave to be called
+    'Timer starts and has an interval of 2 seconds
+    'Once it has reached 2 seconds it displays the nextwavebutton to allow the next wave to be called, and hides the label and stops the timer
 
     Private Sub WaveCompletionUI_Tick(sender As Object, e As EventArgs) Handles WaveCompletionUI.Tick
 
@@ -242,10 +246,11 @@
 
     End Sub
 
-    'If the nextwavebutton is pressed it hides it and increases the wave by one
-    'Checks if the wave is now any of the waves that brings in a new type of enemy so that additionalenemies can be set to 0 for the new enemy type
-    'additionalenemies is increased by 2 to allow a new total of enemies to be brought into the next wave
-    'Wavespawn sub routine is called to spawn the next wave
+    'Occurs if the Nextwavebutton is pressed:
+    'Hides the button and increases the Wave by one
+    'Checks if the Wave is now any of the Waves that brings in a new type of Enemy, if so, Additionalenemies should be set to 0 for this new enemy type
+    'Additionalenemies is increased by 2 to allow a new total of Enemies to be brought into the next Wave
+    'Wavespawn() is called to spawn the next Wave
 
     Private Sub NextWaveButton_Click(sender As Object, e As EventArgs) Handles NextWaveButton.Click
 
@@ -264,8 +269,8 @@
 
     Public Sub WaveSpawn()
 
-        'If else if statements checks which wave it currently is and to create its associated enemies
-        'Each time the game is initialized to reset the arrays and logic variables used during each wave
+        'If else if statements checks which Wave it currently is and to create its associated Enemies
+        'Each time the Game is initialized to reset the Arrays and logic variables used during each Wave, to allow them to be used successfully in the next wave.
 
         If Wave = 1 Then
 
@@ -293,8 +298,8 @@
 
         End If
 
-        'If the wave is no longer wave 1 then for the first ten enemies adjust their positions to be closer to the enemybase so that they get into the game faster
-        'At any point if all the enemies have already been brought into the game exit sub
+        'If the wave is no longer wave 1 then for the first ten Enemies adjust their positions to be closer to the Enemybase so that they get into the game faster
+        'At any point if all the Enemies have already been brought into the Game exit sub
 
         For counter = 0 To 9
 
@@ -307,14 +312,15 @@
 
         Next
 
-        'Reaches this line if there are more than 10 enemies in the wave
-        'Sets the lastenemy to the last enemy to be brought into the game to be used in the condition to bring the next group of enemies in
+        'Reaches this line if there are more Enemies to be brought into the Game.
+        'Sets the LastEnemy to the Last Enemy to be brought into the Game to be used in the condition to bring the next group of Enemies in
+
 
         LastEnemy = Enemies(EnemyNum - 1)
 
     End Sub
 
-    'If this timer starts it will then spawn in another 10 enemies, If at any point enemynum is no longer less than totalenemiesinwave then stop the timer, as this means all the enemies of that wave have been brought it.
+    'Spawns in another 10 Enemies, If at any point enemynum is no longer less than totalenemiesinwave then stop the timer, as this means all the Enemies of that wave have been brought it.
 
     Private Sub EnemySpawnTimer_Tick(sender As Object, e As EventArgs) Handles NextSpawnDelay.Tick
 
@@ -328,18 +334,18 @@
             End If
         Next
 
-        'If the timer has not been stopped then their must still be enemies to be spawned in, therefore enemiesleftover is set to true
+        'Reaches this line if their are Enemies left over
         'LastEnemy is assigned to the last enemy to be brought in
-        'This allows the timer to be recalled again for the next 10 enemies to be brought into the game once the last enemy has died
+        'This allows the timer to be recalled again from the condition in GameLogic for the next 10 Enemies to be brought into the Game once the last Enemy has died
 
         LastEnemy = Enemies(EnemyNum - 1)
         NextSpawnDelay.Stop()
 
     End Sub
 
-    'Runs if the player has clicked the UI to buy a tower
-    'If they have enough coins and are currently not placing a tower as well as the total towers placed has yet to reach 25 and the game hasn't ended
-    'Then set towerplacing to true and show the cancel button
+
+    'If they have enough coins and are currently not placing a Tower as well as the total Towers placed has yet to reach 25 and the Game hasn't ended
+    'Then set Towerplacing to true and show the cancel button
 
     Private Sub BuyTower_Click(sender As Object, e As EventArgs) Handles BuyTower.Click
 
@@ -358,9 +364,10 @@
         Dim p As New Point(18, 16)
 
 
-        'Checks if the tower indicator is not in collision with any picturebox to ensure that the spawn location is valid
-        'If the location is valid then it will hide the UI used during tower placing and create a tower to be placed at this new set position
-        'Each array is redclared to towercount index to allow a new tower to be created with its associated UI
+        'Checks if the Tower Indicator is not in collision with any Picturebox to ensure that the spawn location is valid
+        'If the location is valid then it will Hide the UI used during Tower placing and create a Tower to be placed at this new set position
+        'Each array is redclared to towercount index to allow a new Tower to be created with its associated UI
+        'Once each object for a Tower has been created, it INSTANTIATES a new tower object for this new Tower
 
         If TowerPlacing = True Then
 
@@ -374,6 +381,8 @@
 
             TowerIndicator.Hide()
             CancelPlacing.Hide()
+
+            'Creates a new Picturebox for the Tower
 
             ReDim Preserve PicTower(TowerCount)
 
@@ -394,6 +403,7 @@
             AddHandler PicTower(TowerCount).Click, AddressOf Tower_Click
 
 
+            'Creates a new UI for the Tower
 
             ReDim Preserve TowerUI(TowerCount)
 
@@ -405,6 +415,7 @@
 
             Controls.Add(TowerUI(TowerCount))
 
+            'Creates a new Buff Price for the Tower
 
             ReDim Preserve LblBuffPrice(TowerCount)
 
@@ -421,6 +432,7 @@
 
             TowerUI(TowerCount).Controls.Add(LblBuffPrice(TowerCount))
 
+            'Creates upgrade slots Pictureboxes for the new tOWER
 
             ReDim Preserve UpgradeSlots1(TowerCount)
 
@@ -458,7 +470,7 @@
 
             TowerUI(TowerCount).Controls.Add(UpgradeSlots3(TowerCount))
 
-
+            'Creates a new Tower object at index TowerCount in the Towers array of objects
 
             ReDim Preserve Towers(TowerCount)
             Towers(TowerCount) = New Tower(PicTower(TowerCount), TowerUI(TowerCount), LblBuffPrice(TowerCount), UpgradeSlots1(TowerCount), UpgradeSlots2(TowerCount), UpgradeSlots3(TowerCount), 180, 1, 100)
@@ -475,7 +487,7 @@
     End Sub
 
 
-    'If the cancel Placing button is pressed then stop the player from placing a tower and hide the relevant UI
+    'Stops the player from placing a Tower and Hides the relevant UI
 
     Private Sub CancelPlacing_Click(sender As Object, e As EventArgs) Handles CancelPlacing.Click
 
@@ -485,7 +497,7 @@
 
     End Sub
 
-    'Timer that runs every second and works as if the tower is dealing damage to its target every second
+    'Timer that runs every second to deal damage to its target every second
 
     Private Sub TowerShooting_Tick(sender As Object, e As EventArgs) Handles TowerShooting.Tick
 
@@ -495,7 +507,7 @@
 
     End Sub
 
-    'Runs if a tower is clicked
+
 
     Public Sub Tower_Click(sender As Object, e As EventArgs)
 
@@ -575,7 +587,7 @@
                 .getUpgradeSlots(.getcurrentUpgrade).BackColor = Color.Green
                 Coins -= .getBuffprice
                 .setBuffPrice(250 + (.getcurrentUpgrade * 250))
-                .setcurrentUpgrade(1)
+                .setcurrentUpgrade()
 
             End If
         End With
@@ -803,9 +815,9 @@
 
     End Sub
 
-    Public Sub setLives(LivesLost As Integer)
+    Public Sub setLives()
 
-        Lives -= LivesLost
+        Lives -= 1
 
     End Sub
 
@@ -820,15 +832,15 @@
         TotalCoinsEarned += CoinsEarned
     End Sub
 
-    Public Sub setEnemiesKilledInWave(AmountKilled As Integer)
+    Public Sub setEnemiesKilledInWave()
 
-        EnemiesKilledInWave += AmountKilled
+        EnemiesKilledInWave += 1
 
     End Sub
 
-    Public Sub setTotalEnemiesKilled(AmountKilled As Integer)
+    Public Sub setTotalEnemiesKilled()
 
-        TotalEnemiesKilled += AmountKilled
+        TotalEnemiesKilled += 1
 
     End Sub
     Public Function getEnemies()

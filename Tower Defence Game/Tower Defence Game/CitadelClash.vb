@@ -1,4 +1,7 @@
-﻿Public Class CitadelClash
+﻿Imports System.Data.OleDb
+
+
+Public Class CitadelClash
 
     'ATTRIBUTES USED FOR ENEMIES
 
@@ -65,6 +68,7 @@
 
 
 
+
     'ATTRIBUTES USED FOR THE LEADERBOARD
 
 
@@ -75,6 +79,10 @@
 
     Private PlayerNames() As String = {"QSD", "BMV", "AJS", "123", "HJT", Nothing}
     Private WavesReached() As Integer = {"13", "10", "8", "12", "5", Nothing}
+    Private TotalEnemiesKilled() As Integer = {"148", "91", "69", "123", "29", Nothing}
+    Private TotalCoinsEarned() As Integer = {"825", "483", "351", "675", "145", Nothing}
+
+
 
     'Arrays of label to hold the associated Playername and Wavesreached to allow this information to be displayed on screen
 
@@ -87,8 +95,58 @@
 
     'Information gathered while playing the game which will be used in the Database
 
-    Private TotalEnemiesKilled As Integer
-    Private TotalCoinsEarned As Integer
+    Private currentTotalEnemiesKilled As Integer
+    Private currentTotalCoinsEarned As Integer
+
+
+    Private connect As OleDbConnection
+    Private connectionType As String
+    Private DBFileName As String
+    Private query As String
+    Private command As OleDbCommand
+
+    Private fileReader As System.IO.StreamReader
+    Private leaderboardFileName As String
+    Private tableName As String = "LeaderBoard"
+
+    Public Sub New()
+
+        InitializeComponent()
+
+        connectionType = "Provider=Microsoft.ACE.OLEDB.12.0;"
+        DBFileName = "Data Source=" & CurDir() & "\Databases\Game.accdb"
+
+        leaderboardFileName = CurDir() & "\SQL Commands\LeaderBoard Table Data.txt"
+
+
+        connect = New OleDbConnection(connectionType & DBFileName)
+
+
+        connect.Open()
+
+        If findTable(tableName) = False Then
+
+            'Creates the LeaderBoard table
+
+            query = "CREATE TABLE LeaderBoard (
+        playerID INT NOT NULL AUTOINCREMENT PRIMARY KEY,
+        playerName VARCHAR(3) NOT NULL,
+        WavesReached INT NOT NULL,
+        TotalEnemiesKilled INT NOT NULL,
+        TotalCoinsEarned INT NOT NULL);"
+
+
+            command = New OleDbCommand(query, connect)
+            command.ExecuteNonQuery()
+
+        End If
+
+        connect.Close()
+
+
+
+    End Sub
+
 
 
     Private Sub StartButton_Click(sender As Object, e As EventArgs) Handles StartButton.Click
@@ -121,7 +179,7 @@
 
         If WaveEnded = False And EnemiesKilledInWave = TotalEnemiesInWave Then
 
-            LblWaveCompleteD.Show()
+            LblWavecompleted.Show()
             WaveCompletionUI.Start()
             WaveEnded = True
 
@@ -511,8 +569,8 @@
 
     Public Sub Tower_Click(sender As Object, e As EventArgs)
 
-        'If clickedTower has already been declared then this must be the second time that the same tower was clicked
-        'First time brings up the UI, and this second time will remove it
+        'If Statement that checks if clickedTower has already been assigned a Tower Object, if so then this must be the second time that a Tower has been clicked
+        'As it has been clicked before then the UI has already been displayed, clicking a Tower for a second time will close the UI
 
         If clickedTower IsNot Nothing Then
             clickedTower.getTowerUI.Hide()
@@ -520,7 +578,7 @@
             Exit Sub
         End If
 
-        'Find the tower object that has been clicked and set it to clickedtower
+        'Finds the tower object that has been clicked and set it to clickedtower
 
         For counter = 0 To TowerCount - 1
 
@@ -532,7 +590,7 @@
 
         Next
 
-        'Once clickedtower has been assigned a value then show the towers UI
+        'Once clickedtower has been assigned a value then show the Tower UI
 
         If clickedTower IsNot Nothing Then
 
@@ -556,7 +614,7 @@
 
     Private Sub SellButton_Click(sender As Object, e As EventArgs) Handles SellButton.Click
 
-        'If the sell button is clicked then increase the players coins by 20 and delete the tower and hide the towers UI
+        'If the sell button is clicked then increase the Players coins by 20 and delete the Tower and Hide the Towers UI
 
         Coins += 20
 
@@ -573,9 +631,9 @@
 
     Private Sub DamageBuffbutton_Click(sender As Object, e As EventArgs) Handles DamageBuffButton.Click
 
-        'If the damageBuffbutton is clicked and the player has enough coins and the tower is currently not fully upgraded
-        'Then upgrade the tower to the next availble upgrading, increasing its damage by 1 with every succesive one, changing the upgradeslot of the associated upgrade to green to indicate it has been bought
-        'deduct the buffprice from the coins and set the new buffprice for the next upgrade as well increasing currentUpgrade by 1 so that the next upgrade can be bought
+        'If the Player has enough coins and the Tower is currently not fully upgraded
+        'Then upgrade the Tower to the next availble upgrading, increasing its damage by 1 with every succesive one, changing the upgradeslot of the associated upgrade to green to indicate it has been bought
+        'Deduct the buffprice from the coins and set the new buffprice for the next upgrade as well increasing currentUpgrade by 1 so that the next upgrade can be bought
 
 
         With clickedTower
@@ -640,9 +698,9 @@
 
 
         LblGameOver.Hide()
-        LeaderBoardPanel.Location = New Point(0, 0)
-        LeaderBoardPanel.Show()
-        LeaderBoardPanel.BringToFront()
+        LeaderboardPanel.Location = New Point(0, 0)
+        LeaderboardPanel.Show()
+        LeaderboardPanel.BringToFront()
         LeaderBoardDelay.Stop()
 
     End Sub
@@ -697,6 +755,7 @@
             'Displays leaderbaord UI
 
             UpdateTableButton.Show()
+            RetryButton.Show()
             LblPlayerNamesHeading.Show()
             LblWavesReachedHeading.Show()
 
@@ -714,7 +773,8 @@
         LblPlayerNamesHeading.Hide()
         LblWavesReachedHeading.Hide()
         UpdateTableButton.Hide()
-        LeaderBoardPanel.Hide()
+        RetryButton.Hide()
+        LeaderboardPanel.Hide()
         newName.Text = Nothing
 
         For counter = 0 To 4
@@ -758,6 +818,32 @@
         WaveSpawn()
 
     End Sub
+
+    Private Sub UpdateTableButton_Click(sender As Object, e As EventArgs) Handles UpdateTableButton.Click
+
+
+
+    End Sub
+
+
+    Public Function findTable(tableName As String) As Boolean
+
+        Dim found As Boolean = False
+
+        Dim tempDataTable As DataTable = connect.GetSchema("Tables")
+
+        For Each row As DataRow In tempDataTable.Rows
+
+            If row.Field(Of String)("TABLE_NAME") = tableName Then
+                found = True
+            End If
+
+        Next
+
+        Return found
+
+    End Function
+
 
     Private Sub QuitButton_Click(sender As Object, e As EventArgs) Handles QuitButton.Click
 
@@ -814,6 +900,29 @@
         Next
 
     End Sub
+
+    Public Sub populateTable(totalEnemiesKilled As Integer, totalCoinsEarned As Integer)
+
+
+        connect = New OleDbConnection(connectionType & DBFileName)
+        connect.Open()
+
+        For counter = 0 To 4
+
+            query = "INSERT INTO LeaderBoard VALUES (" & PlayerNames(counter) & "," & WavesReached(counter) & ", " & totalEnemiesKilled(counter) & " , " & totalEnemiesKilled(counter) & ");"
+            command = New OleDbCommand(query, connect)
+            command.ExecuteNonQuery()
+
+        Next
+
+
+
+        connect.Close()
+
+
+
+    End Sub
+
 
     Public Sub setLives()
 

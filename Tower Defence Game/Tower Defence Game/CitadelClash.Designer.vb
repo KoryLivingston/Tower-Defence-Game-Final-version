@@ -478,7 +478,7 @@ Partial Class CitadelClash
         Me.LeaderboardPanel.Controls.Add(Me.PictureBox16)
         Me.LeaderboardPanel.Controls.Add(Me.PictureBox15)
         Me.LeaderboardPanel.Controls.Add(Me.PictureBox18)
-        Me.LeaderboardPanel.Location = New System.Drawing.Point(874, 0)
+        Me.LeaderboardPanel.Location = New System.Drawing.Point(890, 0)
         Me.LeaderboardPanel.Name = "LeaderboardPanel"
         Me.LeaderboardPanel.Size = New System.Drawing.Size(884, 411)
         Me.LeaderboardPanel.TabIndex = 32
@@ -495,6 +495,7 @@ Partial Class CitadelClash
         Me.UpdateTableButton.TabIndex = 23
         Me.UpdateTableButton.Text = "UPDATE TABLE"
         Me.UpdateTableButton.UseVisualStyleBackColor = False
+        Me.UpdateTableButton.Visible = False
         '
         'RetryButton
         '
@@ -507,6 +508,7 @@ Partial Class CitadelClash
         Me.RetryButton.TabIndex = 21
         Me.RetryButton.Text = "RETRY"
         Me.RetryButton.UseVisualStyleBackColor = False
+        Me.RetryButton.Visible = False
         '
         'LblWavesReached5
         '

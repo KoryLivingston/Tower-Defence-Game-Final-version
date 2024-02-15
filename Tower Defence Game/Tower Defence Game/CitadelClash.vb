@@ -95,19 +95,15 @@ Public Class CitadelClash
 
     'Information gathered while playing the game which will be used in the Database
 
-    Private currentTotalEnemiesKilled As Integer
-    Private currentTotalCoinsEarned As Integer
+    Private NewTotalEnemiesKilled As Integer
+    Private NewTotalCoinsEarned As Integer
 
 
-    Private connect As OleDbConnection
     Private connectionType As String
     Private DBFileName As String
+    Private connect As OleDbConnection
     Private query As String
     Private command As OleDbCommand
-
-    Private fileReader As System.IO.StreamReader
-    Private leaderboardFileName As String
-    Private tableName As String = "LeaderBoard"
 
     Public Sub New()
 
@@ -116,20 +112,18 @@ Public Class CitadelClash
         connectionType = "Provider=Microsoft.ACE.OLEDB.12.0;"
         DBFileName = "Data Source=" & CurDir() & "\Databases\Game.accdb"
 
-        leaderboardFileName = CurDir() & "\SQL Commands\LeaderBoard Table Data.txt"
-
 
         connect = New OleDbConnection(connectionType & DBFileName)
 
 
         connect.Open()
 
-        If findTable(tableName) = False Then
+        If findTable("LeaderBoard") = False Then
 
             'Creates the LeaderBoard table
 
             query = "CREATE TABLE LeaderBoard (
-        playerID INT NOT NULL AUTOINCREMENT PRIMARY KEY,
+        playerID INT NOT NULL PRIMARY KEY,
         playerName VARCHAR(3) NOT NULL,
         WavesReached INT NOT NULL,
         TotalEnemiesKilled INT NOT NULL,
@@ -141,13 +135,12 @@ Public Class CitadelClash
 
         End If
 
+
         connect.Close()
 
 
 
     End Sub
-
-
 
     Private Sub StartButton_Click(sender As Object, e As EventArgs) Handles StartButton.Click
 
@@ -565,8 +558,6 @@ Public Class CitadelClash
 
     End Sub
 
-
-
     Public Sub Tower_Click(sender As Object, e As EventArgs)
 
         'If Statement that checks if clickedTower has already been assigned a Tower Object, if so then this must be the second time that a Tower has been clicked
@@ -718,6 +709,8 @@ Public Class CitadelClash
             UserName = newName.Text
             PlayerNames(5) = UserName
             WavesReached(5) = Wave
+            TotalEnemiesKilled(5) = NewTotalEnemiesKilled
+            TotalCoinsEarned(5) = NewTotalCoinsEarned
 
             'INSERTION SORTS the leaderboard with respect to waves reached
 
@@ -725,18 +718,28 @@ Public Class CitadelClash
 
                 Dim tempName = PlayerNames(counter)
                 Dim tempWave = WavesReached(counter)
+                Dim tempTEnemiesKilled = TotalEnemiesKilled(counter)
+                Dim tempTCoinsEarned = TotalCoinsEarned(counter)
+
                 Dim index = counter
 
                 While index > 0 AndAlso tempWave > WavesReached(index - 1)
 
                     WavesReached(index) = WavesReached(index - 1)
                     PlayerNames(index) = PlayerNames(index - 1)
+                    TotalEnemiesKilled(index) = TotalEnemiesKilled(index - 1)
+                    TotalCoinsEarned(index) = TotalCoinsEarned(index - 1)
 
                     index = index - 1
+
+
                 End While
 
                 WavesReached(index) = tempWave
                 PlayerNames(index) = tempName
+                TotalEnemiesKilled(index) = tempTEnemiesKilled
+                TotalCoinsEarned(index) = tempTCoinsEarned
+
 
             Next
 
@@ -784,9 +787,9 @@ Public Class CitadelClash
 
         'Resets player stats
 
-        Lives = 10
+        Lives = 0
         Coins = 60
-        Wave = 1
+        Wave = 21
 
         'Resets the game for enemies
 
@@ -821,10 +824,35 @@ Public Class CitadelClash
 
     Private Sub UpdateTableButton_Click(sender As Object, e As EventArgs) Handles UpdateTableButton.Click
 
+        Dim playerIndex As Integer = 1
 
+        connect = New OleDbConnection(connectionType & DBFileName)
+
+        connect.Open()
+
+        For counter = 0 To 4
+
+
+            query = ("DELETE FROM LeaderBoard WHERE playerID= " & playerIndex)
+            command = New OleDbCommand(query, connect)
+            command.ExecuteNonQuery()
+
+
+            query = "INSERT INTO LeaderBoard (playerID, playerName, WavesReached, TotalEnemiesKilled, TotalCoinsEarned) VALUES ('" & playerIndex & "', '" & PlayerNames(counter) & "','" & WavesReached(counter) & "', '" & TotalEnemiesKilled(counter) & "' , '" & TotalCoinsEarned(counter) & "');"
+            command = New OleDbCommand(query, connect)
+            command.ExecuteNonQuery()
+
+            playerIndex += 1
+
+        Next
+
+        connect.Close()
 
     End Sub
 
+
+    'Used to check if the Table has already been created 
+    'This prevents the program from trying to create a table which already exists
 
     Public Function findTable(tableName As String) As Boolean
 
@@ -900,30 +928,6 @@ Public Class CitadelClash
         Next
 
     End Sub
-
-    Public Sub populateTable(totalEnemiesKilled As Integer, totalCoinsEarned As Integer)
-
-
-        connect = New OleDbConnection(connectionType & DBFileName)
-        connect.Open()
-
-        For counter = 0 To 4
-
-            query = "INSERT INTO LeaderBoard VALUES (" & PlayerNames(counter) & "," & WavesReached(counter) & ", " & totalEnemiesKilled(counter) & " , " & totalEnemiesKilled(counter) & ");"
-            command = New OleDbCommand(query, connect)
-            command.ExecuteNonQuery()
-
-        Next
-
-
-
-        connect.Close()
-
-
-
-    End Sub
-
-
     Public Sub setLives()
 
         Lives -= 1
@@ -938,7 +942,7 @@ Public Class CitadelClash
 
     Public Sub settotalCoinsEarned(CoinsEarned As Integer)
 
-        TotalCoinsEarned += CoinsEarned
+        NewTotalCoinsEarned += CoinsEarned
     End Sub
 
     Public Sub setEnemiesKilledInWave()
@@ -949,7 +953,7 @@ Public Class CitadelClash
 
     Public Sub setTotalEnemiesKilled()
 
-        TotalEnemiesKilled += 1
+        NewTotalEnemiesKilled += 1
 
     End Sub
     Public Function getEnemies()

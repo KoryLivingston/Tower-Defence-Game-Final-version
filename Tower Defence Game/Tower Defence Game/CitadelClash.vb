@@ -22,7 +22,7 @@ Public Class CitadelClash
 
     'additionalEnemies is increased by 2 after a wave has ended, used to increase the amount of enemies spawned for the next wave
     'Enemynum is used to hold the index of the next Enemy to be spawned as well is to check if every Enemy has been spawned
-    'LastEnemy holds the last Enemy to be spawned, used to check if this Enemy has died and to then spawn the remaining amount of enemies, in groups of 10 for that wave 2 seconds later
+    'LastEnemy holds the last Enemy that was spawned, used to check if this Enemy has died and to then spawn the remaining amount of enemies, in maximum groups of 10 for that wave 2 seconds later
 
     Private additionalEnemies As Integer
     Private EnemyNum As Integer
@@ -72,7 +72,7 @@ Public Class CitadelClash
     'ATTRIBUTES USED FOR THE LEADERBOARD
 
 
-    'Arrays to hold the player names and wavesReached of the 5 players in the leaderboard, with 6th position being nothing, which will be assigned to the Player Name and Wavesreached of the current player playing the game
+    'Arrays to hold the PlayeNames and WavesReached of the 5 players in the leaderboard, with 6th position being nothing, which will be assigned to the UserName and Wave attribute of the current player playing the game
     'This will allow this new player to be insertion sorted into the leaderboard while removing one from it as well
     'When the leaderboard will be displayed on the screen it will only display the first 5 Player Names and their associated Waves Reached
     'The arrrays have been set to initial values to hold a starting leaderboard.
@@ -84,16 +84,18 @@ Public Class CitadelClash
 
 
 
-    'Arrays of label to hold the associated Playername and Wavesreached to allow this information to be displayed on screen
+    'Arrays of label to hold the associated Playernames and Wavesreached to allow this information to be displayed on screen
 
     Private NameLabels(4) As Label
     Private WaveReachedLabels(4) As Label
 
-    'UserName contains the name of the player which is currently player, used to add this name to its assoiated position in the leaderboard if they meet the criteria
+    'UserName contains the name which was entered in the leaderboard screen, received from the player who has just played the game
+    'Used to add this name to the 6th position of PLayerNames and WavesReached, to then be INSERTION SORTED to its assoiated position in the leaderboard if they meet the criteria
 
     Private UserName As String
 
-    'Information gathered while playing the game which will be used in the Database
+    'Information gathered by the player while playing the game 
+    'Used to provided additional information of that player in the LeaderBoard table held in the Game Database
 
     Private NewTotalEnemiesKilled As Integer
     Private NewTotalCoinsEarned As Integer
@@ -101,7 +103,7 @@ Public Class CitadelClash
 
     Private connectionType As String
     Private DBFileName As String
-    Private connect As OleDbConnection
+    Private connection As OleDbConnection
     Private query As String
     Private command As OleDbCommand
 
@@ -113,10 +115,10 @@ Public Class CitadelClash
         DBFileName = "Data Source=" & CurDir() & "\Databases\Game.accdb"
 
 
-        connect = New OleDbConnection(connectionType & DBFileName)
+        connection = New OleDbConnection(connectionType & DBFileName)
 
 
-        connect.Open()
+        connection.Open()
 
         If findTable("LeaderBoard") = False Then
 
@@ -130,13 +132,13 @@ Public Class CitadelClash
         TotalCoinsEarned INT NOT NULL);"
 
 
-            command = New OleDbCommand(query, connect)
+            command = New OleDbCommand(query, connection)
             command.ExecuteNonQuery()
 
         End If
 
 
-        connect.Close()
+        connection.Close()
 
 
 
@@ -167,8 +169,8 @@ Public Class CitadelClash
         LblWave.Text = "WAVE " & Wave
 
         'Checks if a wave has ended by comparing the enemieskilled to the totalenemies from that wave
-        'Waveended is used to prevent the condition from running again until the next wave has been called from pressing the next wave button
-        'Starts the wavecompletionUI timer to simulate the label appearing for only 2 seconds, and to show the Nextwavebutton once this has been done
+        'WaveEnded is used to prevent the condition from running again until the next wave has been called from pressing the next wave button
+        'Starts the wavecompletionUI timer to simulate the label appearing for only 2 seconds, and to show the NextWavebutton once this has been done
 
         If WaveEnded = False And EnemiesKilledInWave = TotalEnemiesInWave Then
 
@@ -225,13 +227,15 @@ Public Class CitadelClash
 
 
         'Adjust the Tower indicators position, so that its centre is under the users Cursor at all times
-        'Using a point object, the towerindicator location is set to the Clients location of the cursor sbtracted by p
+        'Using a point object, the towerindicator location is set to the Clients location of the cursor subtracted by p
         'Tower Indicator will only be shown while placing a Tower
 
 
         Dim p As New Point(18, 16)
 
         TowerIndicator.Location = New Point(PointToClient(Cursor.Position) - p)
+
+
 
         'If the player is currently placing a Tower then show the Tower indicator and adjust its opacity
 
@@ -371,7 +375,7 @@ Public Class CitadelClash
 
     End Sub
 
-    'Spawns in another 10 Enemies, If at any point enemynum is no longer less than totalenemiesinwave then stop the timer, as this means all the Enemies of that wave have been brought it.
+    'Spawns in another 10 Enemies, If at any point EnemyNum is no longer less than totalenemiesinwave then stop the timer, as this means all the Enemies of that wave have been brought in.
 
     Private Sub EnemySpawnTimer_Tick(sender As Object, e As EventArgs) Handles NextSpawnDelay.Tick
 
@@ -483,7 +487,7 @@ Public Class CitadelClash
 
             TowerUI(TowerCount).Controls.Add(LblBuffPrice(TowerCount))
 
-            'Creates upgrade slots Pictureboxes for the new tOWER
+            'Creates upgrade slots Pictureboxes for the new TOWER:
 
             ReDim Preserve UpgradeSlots1(TowerCount)
 
@@ -548,7 +552,7 @@ Public Class CitadelClash
 
     End Sub
 
-    'Timer that runs every second to deal damage to its target every second
+    'Timer that runs every second to deal damage to  a TOWERS target every second
 
     Private Sub TowerShooting_Tick(sender As Object, e As EventArgs) Handles TowerShooting.Tick
 
@@ -647,7 +651,7 @@ Public Class CitadelClash
 
     Public Sub InitializeGame()
 
-        'Remoevs pictureboxes of previous wave
+        'Removes pictureboxes of previous wave
 
         For counter = 0 To TotalEnemiesInWave - 1
             Controls.Remove(Enemies(counter).getEnemyGraphic)
@@ -787,9 +791,9 @@ Public Class CitadelClash
 
         'Resets player stats
 
-        Lives = 0
+        Lives = 10
         Coins = 60
-        Wave = 21
+        Wave = 1
 
         'Resets the game for enemies
 
@@ -824,29 +828,28 @@ Public Class CitadelClash
 
     Private Sub UpdateTableButton_Click(sender As Object, e As EventArgs) Handles UpdateTableButton.Click
 
-        Dim playerIndex As Integer = 1
+        'Creates an opens a connection to the database
+        'Then creates a DELETE statement to delete all records
+        'Then creates a INSERT INTO statement to insert in the new leaderboard
 
-        connect = New OleDbConnection(connectionType & DBFileName)
+        connection = New OleDbConnection(connectionType & DBFileName)
 
-        connect.Open()
+        connection.Open()
 
         For counter = 0 To 4
 
 
-            query = ("DELETE FROM LeaderBoard WHERE playerID= " & playerIndex)
-            command = New OleDbCommand(query, connect)
+            query = ("DELETE FROM LeaderBoard WHERE playerID= " & counter + 1)
+            command = New OleDbCommand(query, connection)
             command.ExecuteNonQuery()
 
-
-            query = "INSERT INTO LeaderBoard (playerID, playerName, WavesReached, TotalEnemiesKilled, TotalCoinsEarned) VALUES ('" & playerIndex & "', '" & PlayerNames(counter) & "','" & WavesReached(counter) & "', '" & TotalEnemiesKilled(counter) & "' , '" & TotalCoinsEarned(counter) & "');"
-            command = New OleDbCommand(query, connect)
+            query = "INSERT INTO LeaderBoard (playerID, playerName, WavesReached, TotalEnemiesKilled, TotalCoinsEarned) VALUES ('" & counter + 1 & "', '" & PlayerNames(counter) & "','" & WavesReached(counter) & "', '" & TotalEnemiesKilled(counter) & "' , '" & TotalCoinsEarned(counter) & "');"
+            command = New OleDbCommand(query, connection)
             command.ExecuteNonQuery()
-
-            playerIndex += 1
 
         Next
 
-        connect.Close()
+        connection.Close()
 
     End Sub
 
@@ -858,7 +861,7 @@ Public Class CitadelClash
 
         Dim found As Boolean = False
 
-        Dim tempDataTable As DataTable = connect.GetSchema("Tables")
+        Dim tempDataTable As DataTable = connection.GetSchema("Tables")
 
         For Each row As DataRow In tempDataTable.Rows
 
